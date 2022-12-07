@@ -63,7 +63,8 @@ void t3(void) {
   }
 }
 
-/*
+/* 
+// https://docs.arduino.cc/built-in-examples/digital/Debounce
 void t4(void){
   // read the state of the switch into a local variable:
   int reading = read_buttons(B11);
