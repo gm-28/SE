@@ -1,7 +1,5 @@
 #include "game_logic.h"
 
-int score=0;
-
 int game_state(){
   
   unsigned int n_row=0;
@@ -32,9 +30,10 @@ int *game_row(int *game_rows, int *rows_aux){
   return game_rows;
 }
 
+/*
 int game_score(){
-    score+=1;
+
   Serial.print("\n");
   Serial.print(score);
   return score;
-}
+}*/
