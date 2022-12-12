@@ -5,8 +5,10 @@ int game_state(){
   unsigned int n_row=0;
   unsigned int randNumber=0;
 
-  randNumber = random(50);
-  if(randNumber<=25){
+  randNumber = random(100);
+  /*Serial.print(randNumber);
+  Serial.print("\n");*/
+  if(randNumber<=50){
     n_row=1;
   }
   else{

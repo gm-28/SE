@@ -1,4 +1,3 @@
-/* Define shift register pins used for seven segment display */
 #include "Wire.h"
 #include "Adafruit_LiquidCrystal.h"
 #include "buttons.h"
@@ -15,14 +14,18 @@
 Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5
 Adafruit_LiquidCrystal lcd2(0x21); // DAT -> A4 CLK -> A5
 
-int button1State;            // the current reading from the input pin
-int lastButton1State = LOW;  // the previous reading from the input pin
+int buttonState_11; // the current reading from the input pin
+int buttonState_12;
+int buttonState_21;            
+int buttonState_22;            
 
-unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+int p1_score = 0;
+int p2_score = 0;
 
-int score = 0;
-bool flag = false;
+bool flag_11 = false;
+bool flag_12 = false;
+bool flag_21 = false;
+bool flag_22 = false;
 
 byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character
 
@@ -44,89 +47,67 @@ void t1(void) {
 
 void t2(void) {
   //Serial.print(" B");
-  //lcd_refresh(&lcd2, game_row(game_rows_2,rows_aux_2));
-  if(flag){
-    score +=1;
-    flag = false;
-    Serial.println(score);
+  if(flag_11){
+    p1_score+=1;
+    flag_11 = false;
+    Serial.print("P11 ");
+    Serial.println(p1_score);
+  }
+  else if(flag_12){
+    p1_score+=1;
+    flag_12 = false;
+    Serial.print("P12 ");
+    Serial.println(p1_score);
+  }
+
+  if(flag_21){
+    p2_score+=1;
+    flag_21 = false;
+    Serial.print("P21 ");
+    Serial.println(p2_score);
+  }
+  else if(flag_22){
+    p2_score+=1;
+    flag_22 = false;
+    Serial.print("P22 ");
+    Serial.println(p2_score);
   }
 }
 
 void t3(void) {
-  button1State = read_buttons(B11); // read the state of the pushbutton value
-  //buttonState_2 = read_buttons(B12); // read the state of the pushbutton value
-  
-  if (button1State == HIGH){
+  buttonState_11 = read_buttons(B11); // read the state of the pushbutton value
+  buttonState_12 = read_buttons(B12);
+  buttonState_21 = read_buttons(B21);
+  buttonState_22 = read_buttons(B22);
+
+  if (buttonState_11 == HIGH){
     if(game_rows_1[15]==2){
-      flag=true;
+      flag_11=true;
     }
   }
+  else if (buttonState_12 == HIGH){
+    if(game_rows_1[15]==1){
+      flag_12=true;
+    }
+  }
+
+  //Codigo correto? verificar; 
+  //Se descomentar esta porção causa um erro, P12 sempre a ser impresso; Ao adicionar um print para analisar LCS bugam; task demasiado grande?!
+  //Testar so estas condiçoes com as de cima comentadas causa reset do score semelhante ao erro q tavamos a tentar antes;
+  //Butao 21 n funciona
+  /*if (buttonState_21 == HIGH){
+    if(game_rows_2[15]==2){
+      flag_21=true;
+    }
+  }
+  else if (buttonState_22 == HIGH){
+    if(game_rows_2[15]==1){
+      flag_22=true;
+    }
+  }*/
 }
 
-/* 
-// https://docs.arduino.cc/built-in-examples/digital/Debounce
-void t4(void){
-  // read the state of the switch into a local variable:
-  int reading = read_buttons(B11);
-
-  // check to see if you just pressed the button
-  // (i.e. the input went from LOW to HIGH), and you've waited long enough
-  // since the last press to ignore any noise:
-
-  // If the switch changed, due to noise or pressing:
-  if (reading != lastButton1State) {
-    // reset the debouncing timer
-    lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > debounceDelay) {
-    // whatever the reading is at, it's been there for longer than the debounce
-    // delay, so take it as the actual current state:
-
-    // if the button state has changed:
-    if (reading != button1State) {
-      button1State = reading;
-
-      // only toggle the LED if the new button state is HIGH
-      if (button1State == HIGH){
-          if(game_rows_1[15]==2){
-            score += 1;
-            Serial.println(score);
-            flag=false;
-          }
-        //flag = true;
-        //Serial.println(flag);
-      }
-    }
-  }
-  
-  // save the reading. Next time through the loop, it'll be the lastButtonState:
-  lastButton1State = reading;
-}*/
-
 void setup() {
-  //INIT SCHEDULER
-
-  Sched_Init();
-  Sched_AddT(t1, 0, 500);
-  Sched_AddT(t2, 0, 500);
-  Sched_AddT(t3, 0, 50);
-  //Sched_AddT(t5, 0, 500);
-  //ched_AddT(t4, 0, 50);
-
-  
-  noInterrupts(); // disable all interrupts
-  TCCR1A = 0;
-  TCCR1B = 0;
-  TCNT1  = 0;
- 
-  //OCR1A  = 31250; // compare match register 16MHz/256/2Hz
-  OCR1A  = 62.5; // compare match register 16MHz/256/1kHz
-  //OCR1A = 31;    // compare match register 16MHz/256/2kHz
-  TCCR1B |= (1 << WGM12); // CTC mode
-  TCCR1B |= (1 << CS12); // 256 prescaler
-  TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
-  interrupts(); // enable all interrupts
 
   set_up_button(B11);
   set_up_button(B12);
@@ -141,14 +122,36 @@ void setup() {
   lcd2.begin(16, 2);  // set up the LCD's number of columns and rows
   lcd2.createChar(1,customChar);
 
+  randomSeed(analogRead(0)); // initializes the pseudo-random number generator
+
   Serial.begin(9600);
+
+  //INIT SCHEDULER
+
+  Sched_Init();
+  Sched_AddT(t1, 0, 500); //Task that refreshes LCDs & Executes Game Logic
+  Sched_AddT(t2, 0, 500); //Task that checks and updates Score
+  Sched_AddT(t3, 0, 50);  //Task that reads buttons
+  //Sched_AddT(t4, 0, 500);
+  
+  noInterrupts(); // disable all interrupts
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1  = 0;
+ 
+  //OCR1A  = 31250; // compare match register 16MHz/256/2Hz
+  //OCR1A = 31;    // compare match register 16MHz/256/2kHz
+  OCR1A  = 62.5; // compare match register 16MHz/256/1kHz
+  TCCR1B |= (1 << WGM12); // CTC mode
+  TCCR1B |= (1 << CS12); // 256 prescaler
+  TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
+  interrupts(); // enable all interrupts
 }
 
 void loop() 
 {
   // put your main code here, to run repeatedly:
   Sched_Dispatch();
-
 }
 
 //KERNEKL CODE
