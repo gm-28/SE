@@ -7,8 +7,8 @@
 // defines won't change. Used here to set pin numbers
 #define B11 2 // the number of the pushbutton 1 pin of player 1
 #define B12 3 // the number of the pushbutton 2 pin of player 1
-#define B21 4 // the number of the pushbutton 1 pin of player 2
-#define B22 5 // the number of the pushbutton 2 pin of player 2
+#define B21 5 // the number of the pushbutton 1 pin of player 2
+#define B22 6 // the number of the pushbutton 2 pin of player 2
 
 // Connect via i2c, default address #0 (A0-A2 not jumpered)
 Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5
@@ -21,11 +21,18 @@ int buttonState_22;
 
 int p1_score = 0;
 int p2_score = 0;
+int p1_life = 3;
+int p2_life = 3;
 
 bool flag_11 = false;
 bool flag_12 = false;
 bool flag_21 = false;
 bool flag_22 = false;
+bool dead_11 = false;
+bool dead_12 = false;
+bool dead_21 = false;
+bool dead_22 = false;
+
 
 byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character
 
@@ -53,11 +60,23 @@ void t2(void) {
     Serial.print("P11 ");
     Serial.println(p1_score);
   }
-  else if(flag_12){
+  if(dead_11){
+    p1_life-=1;
+    dead_11 = false;
+    Serial.print("P1_life ");
+    Serial.println(p1_life);
+  }
+  if(flag_12){
     p1_score+=1;
     flag_12 = false;
     Serial.print("P12 ");
     Serial.println(p1_score);
+  }
+   if(dead_12){
+    p1_life-=1;
+    dead_12 = false;
+    Serial.print("P1_life ");
+    Serial.println(p1_life);
   }
 
   if(flag_21){
@@ -66,45 +85,57 @@ void t2(void) {
     Serial.print("P21 ");
     Serial.println(p2_score);
   }
-  else if(flag_22){
+   if(dead_21){
+    p2_life-=1;
+    dead_21 = false;
+    Serial.print("P2_life ");
+    Serial.println(p2_life);
+  }
+  if(flag_22){
     p2_score+=1;
     flag_22 = false;
     Serial.print("P22 ");
     Serial.println(p2_score);
+  } 
+  if(dead_22){
+    p2_life-=1;
+    dead_22 = false;
+    Serial.print("P2_life ");
+    Serial.println(p2_life);
   }
 }
 
 void t3(void) {
   buttonState_11 = read_buttons(B11); // read the state of the pushbutton value
   buttonState_12 = read_buttons(B12);
-  buttonState_21 = read_buttons(B21);
-  buttonState_22 = read_buttons(B22);
 
   if (buttonState_11 == HIGH){
     if(game_rows_1[15]==2){
       flag_11=true;
-    }
+    }else dead_11 = true;
   }
-  else if (buttonState_12 == HIGH){
+  if (buttonState_12 == HIGH){
     if(game_rows_1[15]==1){
       flag_12=true;
-    }
+    }else dead_12 = true;
   }
-
-  //Codigo correto? verificar; 
-  //Se descomentar esta porção causa um erro, P12 sempre a ser impresso; Ao adicionar um print para analisar LCS bugam; task demasiado grande?!
-  //Testar so estas condiçoes com as de cima comentadas causa reset do score semelhante ao erro q tavamos a tentar antes;
-  //Butao 21 n funciona
-  /*if (buttonState_21 == HIGH){
+}
+void t4(void) {
+  buttonState_21 = read_buttons(B21);
+  buttonState_22 = read_buttons(B22);
+  
+  if (buttonState_21 == HIGH){
     if(game_rows_2[15]==2){
       flag_21=true;
-    }
+    } else dead_21 = true;
+            
   }
-  else if (buttonState_22 == HIGH){
+  if (buttonState_22 == HIGH){
     if(game_rows_2[15]==1){
       flag_22=true;
-    }
-  }*/
+    } else dead_22 = true;
+  }
+  
 }
 
 void setup() {
@@ -132,6 +163,7 @@ void setup() {
   Sched_AddT(t1, 0, 500); //Task that refreshes LCDs & Executes Game Logic
   Sched_AddT(t2, 0, 500); //Task that checks and updates Score
   Sched_AddT(t3, 0, 50);  //Task that reads buttons
+  Sched_AddT(t4, 0, 50);  //Task that reads buttons
   //Sched_AddT(t4, 0, 500);
   
   noInterrupts(); // disable all interrupts
