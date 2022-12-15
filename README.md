@@ -1,7 +1,7 @@
 # SE
 Projeto de sistemas embarcados
 
--Falta acabar a lógica das vidas e game_over
+-Falta acabar a lógica das vidas e game_over (verificar foto no git)
 
 -Eventualmente porta serie para comandos
 
