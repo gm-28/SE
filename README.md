@@ -1,7 +1,7 @@
 # SE
 Projeto de sistemas embarcados
 
--Falta acabar a lógica das vidas e game_over (mandar como parametro no lcd_refresh?)
+-Falta acabar a lógica das vidas e game_over (verificar se ta td certo) FALTA TMB FAZER LOGICA DE RESTART
 
 -Eventualmente porta serie para comandos
 
