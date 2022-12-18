@@ -6,7 +6,6 @@ void lcd_refresh(Adafruit_LiquidCrystal *l, int *game_rows){
   l->clear();
   
   for(int i=0;i<=15;i++){
-    //Serial.print(game_rows[i]);
     if(game_rows[i]!=NULL){
       if(game_rows[i] == 2){
         l->setCursor(i, 0);
