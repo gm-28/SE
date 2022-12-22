@@ -9,6 +9,7 @@
 #define B12 3 // the number of the pushbutton 2 pin of player 1
 #define B21 5 // the number of the pushbutton 1 pin of player 2
 #define B22 6 // the number of the pushbutton 2 pin of player 2
+#define B_RESET 12 //the number of the reset pin
 
 // Connect via i2c, default address #0 (A0-A2 not jumpered)
 Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5
@@ -26,6 +27,7 @@ int p2_life = 3;
 
 bool global_flag_1 = false;
 bool global_flag_2 = false;
+bool global_flag_3 = false;
 
 bool flag_11 = false;
 bool flag_12 = false;
@@ -35,6 +37,8 @@ bool dead_11 = false;
 bool dead_12 = false;
 bool dead_21 = false;
 bool dead_22 = false;
+
+String reset = "";
 
 byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character
 
@@ -49,14 +53,23 @@ ISR(TIMER1_COMPA_vect){
 }
 
 void t1(void) {
-  
+
+  if(p1_life==0 && p2_life==0 && global_flag_3==false){
+    Serial.println("Press R to reset");
+    global_flag_3=true;
+    memset(game_rows_1, 0, sizeof(game_rows_1));
+    memset(rows_aux_1, 0, sizeof(rows_aux_1));
+    memset(game_rows_2, 0, sizeof(game_rows_2));
+    memset(rows_aux_2, 0, sizeof(rows_aux_2));
+  }
+
   if(p1_life!=0){
     lcd_refresh(&lcd1, game_row(game_rows_1,rows_aux_1));
     }
   else{
     if(!global_flag_1){
       lcd1.clear();
-      global_flag_1==true;
+      global_flag_1=true;
     }
     
     lcd1.setCursor(2,0);
@@ -77,7 +90,7 @@ void t1(void) {
   else{
     if(!global_flag_2){
       lcd2.clear();
-      global_flag_2==true;
+      global_flag_2=true;
     }
     lcd2.setCursor(2,0);
     lcd2.print("Game Over :(");
@@ -194,6 +207,24 @@ void t4(void) {
   }
 }
 
+void t5(void) {
+  if(global_flag_1==true & global_flag_2==true){ 
+    reset = Serial.readString(); //Reading the Input string from Serial port.
+    reset.trim();  
+    if(reset=="R"){
+      global_flag_1=false;
+      global_flag_2=false;
+      global_flag_3=false;
+      p1_score=0;
+      p2_score=0;
+      p1_life=3;
+      p2_life=3;
+      lcd1.clear();
+      lcd2.clear();
+    }
+  }
+}
+
 void setup() {
 
   set_up_button(B11);
@@ -220,7 +251,7 @@ void setup() {
   Sched_AddT(t2, 0, 500); //Task that checks and updates Score
   Sched_AddT(t3, 0, 50);  //Task that reads buttons
   Sched_AddT(t4, 0, 50);  //Task that reads buttons
-  //Sched_AddT(t4, 0, 500);
+  Sched_AddT(t5, 0, 5);
   
   noInterrupts(); // disable all interrupts
   TCCR1A = 0;
