@@ -251,7 +251,7 @@ void setup() {
   Sched_AddT(t2, 0, 500); //Task that checks and updates Score
   Sched_AddT(t3, 0, 50);  //Task that reads buttons
   Sched_AddT(t4, 0, 50);  //Task that reads buttons
-  Sched_AddT(t5, 0, 5);
+  Sched_AddT(t5, 0, 5);   //Task that resests the game when the users lose
   
   noInterrupts(); // disable all interrupts
   TCCR1A = 0;
