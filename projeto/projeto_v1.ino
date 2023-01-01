@@ -54,13 +54,13 @@ ISR(TIMER1_COMPA_vect){
 
 void t1(void) {
 
-  if(p1_life==0 && p2_life==0 && global_flag_3==false){   // clears the arrays of both LCDs
-    Serial.println("Press R to reset");
+  if(p1_life==0 && p2_life==0 && global_flag_3==false){   // both Players lost all their lives
+    Serial.println("Press R to reset");                   // displays on the Serial Monitor the message to reset the game
     global_flag_3=true;
-    memset(game_rows_1, 0, sizeof(game_rows_1));
-    memset(rows_aux_1, 0, sizeof(rows_aux_1));
-    memset(game_rows_2, 0, sizeof(game_rows_2));
-    memset(rows_aux_2, 0, sizeof(rows_aux_2));
+    memset(game_rows_1, 0, sizeof(game_rows_1));          // clears array...
+    memset(rows_aux_1, 0, sizeof(rows_aux_1));            // clears array...
+    memset(game_rows_2, 0, sizeof(game_rows_2));          // clears array...
+    memset(rows_aux_2, 0, sizeof(rows_aux_2));            // clears array...
   }
 
   if(p1_life!=0){
@@ -211,15 +211,15 @@ void t5(void) {
   if(global_flag_1==true & global_flag_2==true){ 
     reset = Serial.readString();                 // reads the Input string from Serial port
     reset.trim();                                // cleans up the Input string 
-    if(reset=="R"){
+    if(reset=="R"){                              // one of the Players pressed the "R" key in the keyboard
       global_flag_1=false;
       global_flag_2=false;
       global_flag_3=false;
-      p1_score=0;
-      p2_score=0;
-      p1_life=3;
-      p2_life=3;
-      lcd1.clear();
+      p1_score=0;                                // resets the score of Player 1
+      p2_score=0;                                // resets the score of Player 2
+      p1_life=3;                                 // resets the lives of Player 1
+      p2_life=3;                                 // resets the lives of Player 2
+      lcd1.clear();                             
       lcd2.clear();
     }
   }
@@ -227,44 +227,44 @@ void t5(void) {
 
 void setup() {
 
-  set_up_button(B11);  // initialize the pushbutton 1 pin of Player 1 as an input
-  set_up_button(B12);  // initialize the pushbutton 2 pin of Player 1 as an input
-  set_up_button(B21);  // initialize the pushbutton 1 pin of Player 2 as an input
-  set_up_button(B22);  // initialize the pushbutton 2 pin of Player 2 as an input
+  set_up_button(B11);            // initialize the pushbutton 1 pin of Player 1 as an input
+  set_up_button(B12);            // initialize the pushbutton 2 pin of Player 1 as an input
+  set_up_button(B21);            // initialize the pushbutton 1 pin of Player 2 as an input
+  set_up_button(B22);            // initialize the pushbutton 2 pin of Player 2 as an input
 
   lcd1.clear();
-  lcd1.begin(16, 2);  // sets up the Player 1 LCD's number of columns and rows
+  lcd1.begin(16, 2);             // sets up the Player 1 LCD's number of columns and rows
   lcd1.createChar(1,customChar);
   
   lcd2.clear();
-  lcd2.begin(16, 2);  // sets up the Player 2 LCD's number of columns and rows
+  lcd2.begin(16, 2);             // sets up the Player 2 LCD's number of columns and rows
   lcd2.createChar(1,customChar);
 
-  randomSeed(analogRead(0)); // initializes the pseudo-random number generator
+  randomSeed(analogRead(0));     // initializes the pseudo-random number generator
 
   Serial.begin(9600);
 
   //INIT SCHEDULER
 
   Sched_Init();
-  Sched_AddT(t1, 0, 500); // task that refreshes LCDs & Executes Game Logic
-  Sched_AddT(t2, 0, 500); // task that checks and updates the Score
-  Sched_AddT(t3, 0, 50);  // task that reads buttons of Player 1
-  Sched_AddT(t4, 0, 50);  // task that reads buttons of Player 2
-  Sched_AddT(t5, 0, 5);   // task that resests the game when both players lose
+  Sched_AddT(t1, 0, 500);        // task that refreshes LCDs & executes the game logic
+  Sched_AddT(t2, 0, 500);        // task that checks and updates the Score
+  Sched_AddT(t3, 0, 50);         // task that reads buttons of Player 1
+  Sched_AddT(t4, 0, 50);         // task that reads buttons of Player 2
+  Sched_AddT(t5, 0, 5);          // task that resests the game when both players lose
   
-  noInterrupts(); // disable all interrupts
+  noInterrupts();                // disable all interrupts
   TCCR1A = 0;
   TCCR1B = 0;
   TCNT1  = 0;
  
-  //OCR1A  = 31250;        // compare match register 16MHz/256/2Hz
-  //OCR1A = 31;            // compare match register 16MHz/256/2kHz
-  OCR1A  = 62.5;           // compare match register 16MHz/256/1kHz
-  TCCR1B |= (1 << WGM12);  // CTC mode
-  TCCR1B |= (1 << CS12);   // 256 prescaler
-  TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
-  interrupts();            // enable all interrupts
+  //OCR1A  = 31250;              // compare match register 16MHz/256/2Hz
+  //OCR1A = 31;                  // compare match register 16MHz/256/2kHz
+  OCR1A  = 62.5;                 // compare match register 16MHz/256/1kHz
+  TCCR1B |= (1 << WGM12);        // CTC mode
+  TCCR1B |= (1 << CS12);         // 256 prescaler
+  TIMSK1 |= (1 << OCIE1A);       // enable timer compare interrupt
+  interrupts();                  // enable all interrupts
 }
 
 void loop() 
@@ -275,10 +275,10 @@ void loop()
 
 //KERNEL CODE
 typedef struct{
-  int period; /* period in ticks */
-  int delay; /* ticks until next activation */
+  int period;         /* period in ticks */
+  int delay;          /* ticks until next activation */
   void (*func)(void); /* function pointer */
-  int exec; /* activation counter */
+  int exec;           /* activation counter */
 } Sched_Task_t;
 
 #define NT 5
@@ -327,7 +327,7 @@ void Sched_Dispatch(void){
       /* Delete task
       * if one-shot */
       if(!Tasks[x].period) Tasks[x].func = 0;
-      return; //TURNS TO FIXED PRIORITIE
+      return;                                 //TURNS TO FIXED PRIORITIE
     }
   }
 }
