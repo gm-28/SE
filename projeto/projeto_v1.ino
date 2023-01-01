@@ -270,7 +270,7 @@ void setup() {
 
 void loop() 
 {
- //Main code here, to run repeatedly:
+ // main code here that runs repeatedly
   Sched_Dispatch();
 }
 
