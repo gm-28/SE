@@ -11,9 +11,9 @@
 #define B22 6      // the number of the pushbutton 2 pin of player 2
 #define B_RESET 12 // the number of the reset pin
 
-// Connect via i2c, default address #0 (A0-A2 not jumpered)
-Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5
-Adafruit_LiquidCrystal lcd2(0x21); // DAT -> A4 CLK -> A5
+// Connect via i2c
+Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5   A0-A2 not jumpered
+Adafruit_LiquidCrystal lcd2(0x21); // DAT -> A4 CLK -> A5   A0 jumpered
 
 int buttonState_11; // value of the pushbutton 1 of Player 1
 int buttonState_12; // value of the pushbutton 2 of Player 1
@@ -25,27 +25,27 @@ int p2_score = 0;  // score of Player 2
 int p1_life = 3;   // nº of lives of Player 1
 int p2_life = 3;   // nº of lives of Player 2
 
-bool global_flag_1 = false;
-bool global_flag_2 = false;
-bool global_flag_3 = false;
+bool global_flag_1 = false; // True if Player 1 has lost the game
+bool global_flag_2 = false; // True if Player 2 has lost the game
+bool global_flag_3 = false; // True if both Players have lost the game
 
-bool flag_11 = false;
-bool flag_12 = false;
-bool flag_21 = false;
-bool flag_22 = false;
-bool dead_11 = false;
-bool dead_12 = false;
-bool dead_21 = false;
-bool dead_22 = false;
+bool flag_11 = false; // True if Player 1 presses its pushbutton 1 at the currect time
+bool flag_12 = false; // True if Player 1 presses its pushbutton 2 at the currect time
+bool flag_21 = false; // True if Player 2 presses its pushbutton 1 at the currect time
+bool flag_22 = false; // True if Player 2 presses its pushbutton 2 at the currect time
+bool dead_11 = false; // True if Player 1 presses its pushbutton 1 at the wrong time
+bool dead_12 = false; // True if Player 1 presses its pushbutton 2 at the wrong time
+bool dead_21 = false; // True if Player 2 presses its pushbutton 1 at the wrong time
+bool dead_22 = false; // True if Player 2 presses its pushbutton 2 at the wrong time
 
 String reset = "";  // value of the Input string inserted in the Serial Monitor
 
 byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // game character displayed on the LCDs
 
-int game_rows_1[16]={NULL}; 
-int game_rows_2[16]={NULL};
-int rows_aux_1[16];
-int rows_aux_2[16];
+int game_rows_1[16]={NULL}; // array that stores the current game state of Player 1
+int game_rows_2[16]={NULL}; // array that stores the current game state of Player 2
+int rows_aux_1[16];         // array that stores the previous game state of Player 1
+int rows_aux_2[16];         // array that stores the previous game state of Player 2
 
 //timer1 interrupt
 ISR(TIMER1_COMPA_vect){
@@ -57,10 +57,10 @@ void t1(void) {
   if(p1_life==0 && p2_life==0 && global_flag_3==false){   // both Players lost all their lives
     Serial.println("Press R to reset");                   // displays on the Serial Monitor the message to reset the game
     global_flag_3=true;
-    memset(game_rows_1, 0, sizeof(game_rows_1));          // clears array...
-    memset(rows_aux_1, 0, sizeof(rows_aux_1));            // clears array...
-    memset(game_rows_2, 0, sizeof(game_rows_2));          // clears array...
-    memset(rows_aux_2, 0, sizeof(rows_aux_2));            // clears array...
+    memset(game_rows_1, 0, sizeof(game_rows_1));          // clears array
+    memset(rows_aux_1, 0, sizeof(rows_aux_1));            // clears array
+    memset(game_rows_2, 0, sizeof(game_rows_2));          // clears array
+    memset(rows_aux_2, 0, sizeof(rows_aux_2));            // clears array
   }
 
   if(p1_life!=0){
@@ -270,7 +270,7 @@ void setup() {
 
 void loop() 
 {
-  // put your main code here, to run repeatedly:
+ //Main code here, to run repeatedly:
   Sched_Dispatch();
 }
 
