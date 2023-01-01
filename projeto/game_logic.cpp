@@ -1,13 +1,13 @@
 #include "game_logic.h"
 
+// returns a random number from 0 to 99
 int game_state(){
   
   unsigned int n_row=0;
   unsigned int randNumber=0;
 
   randNumber = random(100);
-  /*Serial.print(randNumber);
-  Serial.print("\n");*/
+  
   if(randNumber<=50){
     n_row=1;
   }
@@ -31,11 +31,3 @@ int *game_row(int *game_rows, int *rows_aux){
   }
   return game_rows;
 }
-
-/*
-int game_score(){
-
-  Serial.print("\n");
-  Serial.print(score);
-  return score;
-}*/
