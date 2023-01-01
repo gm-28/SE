@@ -2,7 +2,7 @@
 #include "Wire.h"
 #include "Adafruit_LiquidCrystal.h"
 
-void lcd_refresh(Adafruit_LiquidCrystal *l, int *game_rows){ // Displays on the LCD the updated game state
+void lcd_refresh(Adafruit_LiquidCrystal *l, int *game_rows){ // displays on the LCD the updated game state
   l->clear();
   
   for(int i=0;i<=15;i++){
