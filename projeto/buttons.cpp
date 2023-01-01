@@ -5,5 +5,5 @@ void set_up_button(byte pin){
 }
 
 int read_buttons(byte pin){
-  return(digitalRead(pin));  // read the state of the pushbutton value
+  return(digitalRead(pin));  // reads the state of the pushbutton value
 }
