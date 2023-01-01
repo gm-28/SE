@@ -208,6 +208,7 @@ void t4(void) {
 }
 
 void t5(void) {
+  
   if(global_flag_1==true & global_flag_2==true){ 
     reset = Serial.readString();                 // reads the Input string from Serial Monitor
     reset.trim();                                // cleans up the Input string 
