@@ -5,11 +5,11 @@
 #include "displays.h"
 
 // defines won't change. Used here to set pin numbers
-#define B11 2 // the number of the pushbutton 1 pin of player 1
-#define B12 3 // the number of the pushbutton 2 pin of player 1
-#define B21 5 // the number of the pushbutton 1 pin of player 2
-#define B22 6 // the number of the pushbutton 2 pin of player 2
-#define B_RESET 12 //the number of the reset pin
+#define B11 2      // the number of the pushbutton 1 pin of player 1
+#define B12 3      // the number of the pushbutton 2 pin of player 1
+#define B21 5      // the number of the pushbutton 1 pin of player 2
+#define B22 6      // the number of the pushbutton 2 pin of player 2
+#define B_RESET 12 // the number of the reset pin
 
 // Connect via i2c, default address #0 (A0-A2 not jumpered)
 Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5
@@ -40,7 +40,7 @@ bool dead_22 = false;
 
 String reset = "";  // value of the Input string inserted in the Serial Monitor
 
-byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character of LCDs
+byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // game character displayed on the LCDs
 
 int game_rows_1[16]={NULL}; 
 int game_rows_2[16]={NULL};
@@ -68,7 +68,7 @@ void t1(void) {
   }
   else{
     if(!global_flag_1){
-      lcd1.clear();
+      lcd1.clear();                                       // clears screen of the LCD of Player 1
       global_flag_1=true;
     }
     
@@ -89,7 +89,7 @@ void t1(void) {
   }
   else{
     if(!global_flag_2){
-      lcd2.clear();
+      lcd2.clear();                                       // clears screen of the LCD of Player 2
       global_flag_2=true;
     }
     lcd2.setCursor(2,0);
@@ -219,8 +219,8 @@ void t5(void) {
       p2_score=0;                                // resets the score of Player 2
       p1_life=3;                                 // resets the lives of Player 1
       p2_life=3;                                 // resets the lives of Player 2
-      lcd1.clear();                             
-      lcd2.clear();
+      lcd1.clear();                              // clears screen of the LCD of Player 1                             
+      lcd2.clear();                              // clears screen of the LCD of Player 2
     }
   }
 }
@@ -232,13 +232,13 @@ void setup() {
   set_up_button(B21);            // initialize the pushbutton 1 pin of Player 2 as an input
   set_up_button(B22);            // initialize the pushbutton 2 pin of Player 2 as an input
 
-  lcd1.clear();
+  lcd1.clear();                  // clears screen of the LCD of Player 1
   lcd1.begin(16, 2);             // sets up the Player 1 LCD's number of columns and rows
-  lcd1.createChar(1,customChar);
+  lcd1.createChar(1,customChar); // creates the game character on the LCD of Player 1
   
-  lcd2.clear();
+  lcd2.clear();                  // clears screen of the LCD of Player 2
   lcd2.begin(16, 2);             // sets up the Player 2 LCD's number of columns and rows
-  lcd2.createChar(1,customChar);
+  lcd2.createChar(1,customChar); // creates the game character on the LCD of Player 2
 
   randomSeed(analogRead(0));     // initializes the pseudo-random number generator
 
