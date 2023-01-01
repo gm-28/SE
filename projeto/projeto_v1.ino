@@ -15,15 +15,15 @@
 Adafruit_LiquidCrystal lcd1(0x20); // DAT -> A4 CLK -> A5
 Adafruit_LiquidCrystal lcd2(0x21); // DAT -> A4 CLK -> A5
 
-int buttonState_11; // the current reading from the input pin
-int buttonState_12;
-int buttonState_21;            
-int buttonState_22;            
+int buttonState_11; // value of the pushbutton 1 of Player 1
+int buttonState_12; // value of the pushbutton 2 of Player 1
+int buttonState_21; // value of the pushbutton 1 of Player 2         
+int buttonState_22; // value of the pushbutton 2 of Player 2  
 
-int p1_score = 0;
-int p2_score = 0;
-int p1_life = 3;
-int p2_life = 3;
+int p1_score = 0;  // score of Player 1
+int p2_score = 0;  // score of Player 2
+int p1_life = 3;   // nº of lives of Player 1
+int p2_life = 3;   // nº of lives of Player 2
 
 bool global_flag_1 = false;
 bool global_flag_2 = false;
@@ -40,7 +40,7 @@ bool dead_22 = false;
 
 String reset = "";
 
-byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character
+byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character of LCDs
 
 int game_rows_1[16]={NULL}; 
 int game_rows_2[16]={NULL};
@@ -54,7 +54,7 @@ ISR(TIMER1_COMPA_vect){
 
 void t1(void) {
 
-  if(p1_life==0 && p2_life==0 && global_flag_3==false){
+  if(p1_life==0 && p2_life==0 && global_flag_3==false){   // clears the arrays of both LCDs
     Serial.println("Press R to reset");
     global_flag_3=true;
     memset(game_rows_1, 0, sizeof(game_rows_1));
@@ -64,8 +64,8 @@ void t1(void) {
   }
 
   if(p1_life!=0){
-    lcd_refresh(&lcd1, game_row(game_rows_1,rows_aux_1));
-    }
+    lcd_refresh(&lcd1, game_row(game_rows_1,rows_aux_1)); // refreshes the screen of LCD of Player 1
+  }
   else{
     if(!global_flag_1){
       lcd1.clear();
@@ -73,19 +73,19 @@ void t1(void) {
     }
     
     lcd1.setCursor(2,0);
-    lcd1.print("Game Over :(");
+    lcd1.print("Game Over :(");                           // indicates in the top row of the LCD of Player 1 that he lost all his lives 
     lcd1.setCursor(4,1);
 
     if(p1_score<10){
-      lcd1.print(String("Score  ") + String(p1_score));
+      lcd1.print(String("Score  ") + String(p1_score));   // displays on the LCD the score that Player 1 achieved if he scored less than 10 in the bottom row
     }
     else{
-      lcd1.print(String("Score ") + String(p1_score));
+      lcd1.print(String("Score ") + String(p1_score));    // displays on the LCD the score that Player 1 achieved if he scored more than 10 in the bottom row
     }
   }
 
   if(p2_life!=0){
-    lcd_refresh(&lcd2, game_row(game_rows_2,rows_aux_2));
+    lcd_refresh(&lcd2, game_row(game_rows_2,rows_aux_2)); // refreshes the screen of LCD of Player 2
   }
   else{
     if(!global_flag_2){
@@ -93,14 +93,14 @@ void t1(void) {
       global_flag_2=true;
     }
     lcd2.setCursor(2,0);
-    lcd2.print("Game Over :(");
+    lcd2.print("Game Over :(");                           // indicates in the top row of the LCD of Player 2 that he lost all his lives 
     lcd2.setCursor(4,1);
     
-    if(p2_score<10){
-      lcd2.print(String("Score  ") + String(p2_score));
+    if(p2_score<10){                                      
+      lcd2.print(String("Score  ") + String(p2_score));   // displays on the LCD the score that Player 2 achieved if he scored less than 10 in the bottom row
     }
     else{
-      lcd2.print(String("Score ") + String(p2_score));
+      lcd2.print(String("Score ") + String(p2_score));    // displays on the LCD the score that Player 2 achieved if he scored more than 10 in the bottom row
     }
   }
 } 
@@ -109,60 +109,60 @@ void t2(void) {
   
   if(p1_life!=0){
     if(flag_11){
-      p1_score+=1;
+      p1_score+=1;              // adds 1 point to Player 1 score
       flag_11 = false;
-      Serial.print("P11 ");
+      Serial.print("P11 ");     // displays on the Serial Monitor the score of Player 1 if its pushbutton 1 was pressed at the correct time
       Serial.println(p1_score);
     }
     
     if(dead_11){
-      p1_life-=1;
+      p1_life-=1;               // deducts 1 life of Player 1
       dead_11 = false;
-      Serial.print("P1_life ");
+      Serial.print("P1_life "); // displays on the Serial Monitor the remaining lifes of Player 1 if its pushbutton 1 was pressed at the wrong time
       Serial.println(p1_life);
     }
 
     if(flag_12){
-      p1_score+=1;
+      p1_score+=1;              // adds 1 point to Player 1 score
       flag_12 = false;
-      Serial.print("P12 ");
+      Serial.print("P12 ");     // displays on the Serial Monitor the score of Player 1 if its pushbutton 2 was pressed at the correct time
       Serial.println(p1_score);
     }
 
     if(dead_12){
-      p1_life-=1;
+      p1_life-=1;               // deducts 1 life of Player 1
       dead_12 = false;
-      Serial.print("P1_life ");
+      Serial.print("P1_life "); // displays on the Serial Monitor the remaining lifes of Player 1 if its pushbutton 2 was pressed at the wrong time
       Serial.println(p1_life);
     }
   }
 
   if(p2_life!=0){
     if(flag_21){
-      p2_score+=1;
+      p2_score+=1;              // adds 1 point to Player 2 score
       flag_21 = false;
-      Serial.print("P21 ");
+      Serial.print("P21 ");     // displays on the Serial Monitor the score of Player 2 if its pushbutton 1 was pressed at the correct time
       Serial.println(p2_score);
     }
 
     if(dead_21){
-      p2_life-=1;
+      p2_life-=1;               // deducts 1 life of Player 2
       dead_21 = false;
-      Serial.print("P2_life ");
+      Serial.print("P2_life "); // displays on the Serial Monitor the remaining lifes of Player 2 if its pushbutton 1 was pressed at the wrong time
       Serial.println(p2_life);
     }
 
     if(flag_22){
-      p2_score+=1;
+      p2_score+=1;              // adds 1 point to Player 2 score
       flag_22 = false;
-      Serial.print("P22 ");
+      Serial.print("P22 ");     // displays on the Serial Monitor the score of Player 2 if its pushbutton 2 was pressed at the correct time
       Serial.println(p2_score);
     } 
 
     if(dead_22){
-      p2_life-=1;
+      p2_life-=1;               // deducts 1 life of Player 2
       dead_22 = false;
-      Serial.print("P2_life ");
+      Serial.print("P2_life "); // displays on the Serial Monitor the remaining lifes of Player 2 if its pushbutton 2 was pressed at the wrong time
       Serial.println(p2_life);
     }
   }
@@ -171,15 +171,15 @@ void t2(void) {
 void t3(void) {
   
   if(p1_life!=0){
-    buttonState_11 = read_buttons(B11); // read the state of the pushbutton value
-    buttonState_12 = read_buttons(B12);
+    buttonState_11 = read_buttons(B11); // reads the state of the pushbutton 1 of Player 1
+    buttonState_12 = read_buttons(B12); // reads the state of the pushbutton 2 of Player 1
   
-    if (buttonState_11 == HIGH){
+    if (buttonState_11 == HIGH){        // moment Player 1 pressed its pushbutton 1
     if(game_rows_1[15]==2){
       flag_11=true;
     }else dead_11 = true;
     }
-    if (buttonState_12 == HIGH){
+    if (buttonState_12 == HIGH){        // moment Player 1 pressed its pushbutton 2
       if(game_rows_1[15]==1){
         flag_12=true;
       }else dead_12 = true;
@@ -190,16 +190,16 @@ void t3(void) {
 void t4(void) {
   
   if(p2_life!=0){
-    buttonState_21 = read_buttons(B21);
-    buttonState_22 = read_buttons(B22);
+    buttonState_21 = read_buttons(B21); // reads the state of the pushbutton 1 of Player 2
+    buttonState_22 = read_buttons(B22); // reads the state of the pushbutton 2 of Player 2
   
-    if (buttonState_21 == HIGH){
+    if (buttonState_21 == HIGH){        // moment Player 2 pressed its pushbutton 1
       if(game_rows_2[15]==2){
         flag_21=true;
       } else dead_21 = true;
               
     }
-    if (buttonState_22 == HIGH){
+    if (buttonState_22 == HIGH){        // moment Player 2 pressed its pushbutton 2
       if(game_rows_2[15]==1){
         flag_22=true;
       } else dead_22 = true;
@@ -209,8 +209,8 @@ void t4(void) {
 
 void t5(void) {
   if(global_flag_1==true & global_flag_2==true){ 
-    reset = Serial.readString(); //Reading the Input string from Serial port.
-    reset.trim();  
+    reset = Serial.readString();                 // reads the Input string from Serial port
+    reset.trim();                                // cleans up the Input string 
     if(reset=="R"){
       global_flag_1=false;
       global_flag_2=false;
@@ -227,17 +227,17 @@ void t5(void) {
 
 void setup() {
 
-  set_up_button(B11);
-  set_up_button(B12);
-  set_up_button(B21);
-  set_up_button(B22);
+  set_up_button(B11);  // initialize the pushbutton 1 pin of Player 1 as an input
+  set_up_button(B12);  // initialize the pushbutton 2 pin of Player 1 as an input
+  set_up_button(B21);  // initialize the pushbutton 1 pin of Player 2 as an input
+  set_up_button(B22);  // initialize the pushbutton 2 pin of Player 2 as an input
 
   lcd1.clear();
-  lcd1.begin(16, 2);  // set up the lcd1's number of columns and rows
+  lcd1.begin(16, 2);  // sets up the Player 1 LCD's number of columns and rows
   lcd1.createChar(1,customChar);
   
   lcd2.clear();
-  lcd2.begin(16, 2);  // set up the LCD's number of columns and rows
+  lcd2.begin(16, 2);  // sets up the Player 2 LCD's number of columns and rows
   lcd2.createChar(1,customChar);
 
   randomSeed(analogRead(0)); // initializes the pseudo-random number generator
@@ -247,24 +247,24 @@ void setup() {
   //INIT SCHEDULER
 
   Sched_Init();
-  Sched_AddT(t1, 0, 500); //Task that refreshes LCDs & Executes Game Logic
-  Sched_AddT(t2, 0, 500); //Task that checks and updates Score
-  Sched_AddT(t3, 0, 50);  //Task that reads buttons
-  Sched_AddT(t4, 0, 50);  //Task that reads buttons
-  Sched_AddT(t5, 0, 5);   //Task that resests the game when the users lose
+  Sched_AddT(t1, 0, 500); // task that refreshes LCDs & Executes Game Logic
+  Sched_AddT(t2, 0, 500); // task that checks and updates the Score
+  Sched_AddT(t3, 0, 50);  // task that reads buttons of Player 1
+  Sched_AddT(t4, 0, 50);  // task that reads buttons of Player 2
+  Sched_AddT(t5, 0, 5);   // task that resests the game when both players lose
   
   noInterrupts(); // disable all interrupts
   TCCR1A = 0;
   TCCR1B = 0;
   TCNT1  = 0;
  
-  //OCR1A  = 31250; // compare match register 16MHz/256/2Hz
-  //OCR1A = 31;    // compare match register 16MHz/256/2kHz
-  OCR1A  = 62.5; // compare match register 16MHz/256/1kHz
-  TCCR1B |= (1 << WGM12); // CTC mode
-  TCCR1B |= (1 << CS12); // 256 prescaler
+  //OCR1A  = 31250;        // compare match register 16MHz/256/2Hz
+  //OCR1A = 31;            // compare match register 16MHz/256/2kHz
+  OCR1A  = 62.5;           // compare match register 16MHz/256/1kHz
+  TCCR1B |= (1 << WGM12);  // CTC mode
+  TCCR1B |= (1 << CS12);   // 256 prescaler
   TIMSK1 |= (1 << OCIE1A); // enable timer compare interrupt
-  interrupts(); // enable all interrupts
+  interrupts();            // enable all interrupts
 }
 
 void loop() 
