@@ -38,7 +38,7 @@ bool dead_12 = false;
 bool dead_21 = false;
 bool dead_22 = false;
 
-String reset = "";
+String reset = "";  // value of the Input string inserted in the Serial Monitor
 
 byte customChar[8] = {0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111,0b11111}; // display character of LCDs
 
@@ -209,7 +209,7 @@ void t4(void) {
 
 void t5(void) {
   if(global_flag_1==true & global_flag_2==true){ 
-    reset = Serial.readString();                 // reads the Input string from Serial port
+    reset = Serial.readString();                 // reads the Input string from Serial Monitor
     reset.trim();                                // cleans up the Input string 
     if(reset=="R"){                              // one of the Players pressed the "R" key in the keyboard
       global_flag_1=false;
